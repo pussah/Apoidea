@@ -12,8 +12,10 @@
 %% @doc Starts a worker
 %% Dummy function for starting a predefined worker
 start() -> 
-	% Content = [{<<"XXX.avi">>, 10, all}, {<<"insurance.aes">>, 10, [1, 2, 5]}],
-	Content = [<<"XXX.avi">>, 10, all, endfile, <<"insurance.aes">>, 3, 0, 2],
+	% TODO: how do we represent content?
+	% Should be a list of files the worker has and the number 
+	% of pieces the worker possesses.
+	Content = "SomeNiceContent",
 	start("localhost", 5678, Content).
 
 	

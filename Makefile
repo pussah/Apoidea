@@ -7,8 +7,14 @@ build: $(FILES)
 	
 clean:
 	rm -f *.beam erl_crash.dump
+	
+start_worker: build
+	erl -noshell -s worker start -s init stop
+	
+start_drone: build
+	erl -noshell -s drone start
 
-# TODO: clean up
+# TODO: make it prettier
 test: build
 	erl -noshell -s network test -s init stop
 	erl -noshell -s worker test -s init stop

@@ -14,3 +14,11 @@ GENERATE DOCUMENTATION:
 	
 RUN TESTS:
 	$ make tests
+	
+START DRONE:
+	$ make start_drone
+	
+START WORKER:
+	$ make start_worker
+	
+TODO:
