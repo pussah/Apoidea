@@ -21,7 +21,7 @@ test: build
 	erl -noshell -s crypto test -s init stop
 	erl -noshell -s drone test -s init stop
 	
-docs:
+doc:
 	erl -noshell -eval "edoc:files(["`echo "$(FILES)" | sed s/\ /,/g`"], [{dir, doc}])." -s init stop
 	
 rebuild: clean build
