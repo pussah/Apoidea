@@ -1,0 +1,16 @@
+Welcome to the Apoidea Project
+
+PREREQUISITES:
+	1. Erlang
+	2. EUnit
+	3. EDoc
+	4. GNU Make
+	
+BUILD:
+	$ make
+	
+GENERATE DOCUMENTATION:
+	$ make docs
+	
+RUN TESTS:
+	$ make tests
