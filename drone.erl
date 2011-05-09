@@ -38,7 +38,15 @@ accept_worker(Sock) ->
 		
 	% TODO: handle errors
 	Content = network:recv(Sock, ""),
-	io:format("<drone> received content: ~s~n", [Content]),
+	parse_contents(utils:generate_content_list(Content)),
 	
 	io:format("<drone> closing connection to worker~n"),
 	network:close(Sock).
+	
+parse_contents([]) -> io:format("<drone> content: end~n");
+parse_contents([H|T]) ->
+	io:format("<drone> content: ~s~n", [parse_content(H)]),
+	parse_contents(T).
+	
+parse_content({Name, Pieces, Possessions}) -> 
+	io_lib:format("File: ~s (~w pieces, possessions: ~w)", [Name, Pieces, Possessions]).

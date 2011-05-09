@@ -12,7 +12,8 @@
 
 
 %% @doc Creates a connection over TCP
-%% Connect to Address:Port over TCP
+%% Connect to Address:Port over TCP and
+%% does a three-way handshake
 conn(Address, Port) ->
 	case gen_tcp:connect(Address, Port, ?TCPOPTS) of
 	
@@ -54,8 +55,8 @@ conn(Address, Port) ->
 									{Key, Sock}
 							end
 					end
-			end
-	end.	
+			end % oh, this is ugly!
+	end.
 
 %% @doc Sends an encrypted message over a socket
 %% Uses Key to encrypt Message and sends it over Sock.

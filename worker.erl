@@ -15,8 +15,13 @@ start() ->
 	% TODO: how do we represent content?
 	% Should be a list of files the worker has and the number 
 	% of pieces the worker possesses.
-	Content = "SomeNiceContent",
-	start("localhost", 5678, Content).
+	Content = 
+	[
+		{"Filename1", 10, [1, 2, 3]},
+		{"Filename2", 2, all},
+		{"Filename3", 2, [1]}
+	],
+	start("localhost", 5678, utils:generate_content_string(Content)).
 
 	
 %% @doc Starts a worker

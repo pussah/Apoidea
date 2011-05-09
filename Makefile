@@ -1,12 +1,12 @@
 CC = erlc
-FILES = network.erl worker.erl drone.erl crypto.erl
+FILES = network.erl worker.erl drone.erl crypto.erl utils.erl
 
 # TODO: dependencies
 build: $(FILES)
 	$(CC) $(FILES)
 	
 clean:
-	rm -f *.beam erl_crash.dump
+	rm -rf *.beam erl_crash.dump doc
 	
 start_worker: build
 	erl -noshell -s worker start -s init stop
@@ -20,6 +20,7 @@ test: build
 	erl -noshell -s worker test -s init stop
 	erl -noshell -s crypto test -s init stop
 	erl -noshell -s drone test -s init stop
+	erl -noshell -s utils test -s init stop
 	
 doc:
 	erl -noshell -eval "edoc:files(["`echo "$(FILES)" | sed s/\ /,/g`"], [{dir, doc}])." -s init stop

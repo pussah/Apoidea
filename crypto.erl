@@ -12,3 +12,5 @@ encrypt(Data, Key) -> Data. % TODO
 
 %% @doc Decrypts a message using a key
 decrypt(Data, Key) -> Data. % TODO
+
+
