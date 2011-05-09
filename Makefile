@@ -35,8 +35,11 @@ clean_docs:
 	- rm -Rf $(EDOC)/*.*
 	- cp *.edoc $(EDOC)/
 	
-start_worker: build
-	erl -noshell -pa $(EBIN) -s worker start -s init stop
+start_uploader: build
+	erl -noshell -pa $(EBIN) -s worker start_uploader -s init stop
+	
+start_downloader: build
+	erl -noshell -pa $(EBIN) -s worker start_downloader -s init stop
 	
 start_drone: build
 	erl -noshell -pa $(EBIN) -s drone start

@@ -7,7 +7,7 @@
 %% </p>
 
 -module(network).
--export([conn/2, send/3, send/5, recv/2, listen/2, close/1]).
+-export([conn/2, send/3, send/5, recv/2, listen/2, close/1, handshake/1]).
 -define(TCPOPTS, [list, {active, false}, {packet, 0}]).
 -define(UDPOPTS, [list, {active, false}, {packet, 0}]).
 -include_lib("eunit/include/eunit.hrl").
@@ -15,39 +15,47 @@
 
 %% @doc Creates a connection over TCP
 %% <p>
-%% Connect to Address:Port over TCP and
-%% does a three-way handshake
+%% Connect to Address:Port over TCP
 %% </p>
 conn(Address, Port) ->
 	case gen_tcp:connect(Address, Port, ?TCPOPTS) of
+		{error, Reason} -> {error, report_error(Reason)};
+		{ok, Sock} -> {ok, Sock}
+	end.
 	
+%% @doc Does a three-way handshake
+%% <p>
+%% Uses a connection to create a three-way handshake
+%% </p>
+handshake(Sock) ->
+	io:format("<net> handshake: connected~n"),
+
+	% part 0: start handshake
+	case gen_tcp:send(Sock, "init") of
 		{error, Reason} ->
 			{error, report_error(Reason)};
 			
-		% perform a three-way handshake
-		{ok, Sock} ->
-			io:format("<net> handshake: connected~n"),
-		
+		ok ->
 			% part 1: receive challenge
 			case gen_tcp:recv(Sock, 0) of
-	
+
 				{error, Reason} ->
 					{error, report_error(Reason)};
-			
+	
 				{ok, Challenge} ->
 					io:format("<net> handshake: challenge: ~s~n", [Challenge]),
-		
+
 					% TODO: do some stuff with the Challenge and calculate Response
 					Response = "who's there?",
-	
+
 					% part 2: send response
 					case gen_tcp:send(Sock, Response) of
 						{error, Reason} ->
 							{error, report_error(Reason)};
-							
+					
 						ok ->
 							io:format("<net> handshake: response: ~s~n", [Response]),
-				
+		
 							% part 3: receive completion
 							case gen_tcp:recv(Sock, 0) of
 								{error, Reason} ->
@@ -59,7 +67,7 @@ conn(Address, Port) ->
 									{Key, Sock}
 							end
 					end
-			end % oh, this is ugly!
+			end
 	end.
 
 %% @doc Sends an encrypted message over a socket
@@ -125,8 +133,10 @@ listen(sock, ListenSock, Callback) ->
 		{error, Reason} -> {error, report_error(Reason)};
 		
 		{ok, Sock} ->
-			Callback(Sock),
-			listen(sock, ListenSock, Callback)
+			case Callback(Sock) of
+				ok -> listen(sock, ListenSock, Callback);
+				eol -> eol
+			end
 	end.
 	
 %% @doc Closes a socket

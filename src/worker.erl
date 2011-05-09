@@ -7,25 +7,42 @@
 %% </p>
 
 -module(worker).
--export([start/0, start/3]).
+-export([start_uploader/0, start_downloader/0, init/3]).
 -include_lib("eunit/include/eunit.hrl").
 
-	
-%% @doc Starts a worker
+
+%% @doc Starts a worker and listens for requests
 %% <p>
-%% Dummy function for starting a predefined worker.
+%% Dummy function for starting a predefined worker which
+%% connects to a hive and then listens for connections.
 %% </p>
-start() -> 
-	% TODO: how do we represent content?
-	% Should be a list of files the worker has and the number 
-	% of pieces the worker possesses.
+start_uploader() -> 
 	Content = 
 	[
 		{"Filename1", 10, [1, 2, 3]},
 		{"Filename2", 2, all},
 		{"Filename3", 2, [1]}
 	],
-	start("localhost", 5678, utils:generate_content_string(Content)).
+	io:format("<uploader> starting~n"),
+	init("localhost", 5678, utils:generate_content_string(Content)),
+	io:format("<uploader> listening for requests~n"),
+	network:listen(6789, fun send_piece/1).
+	
+
+%% @doc Starts a worker and sends a request
+%% <p>
+%% Dummy function for starting a predefined worker which
+%% connects to a hive and then requests a file.
+%% </p>
+start_downloader() -> 
+	io:format("<downloader> starting~n"),
+	Key = init("localhost", 5678, utils:generate_content_string([])),
+	io:format("<downloader> sending request for file~n"),
+	{ok, Sock} = network:conn("localhost", 5678),
+	network:send(Sock, Key, "request"),
+	io:format("<downloader> listening for piece~n"),
+	network:listen(4567, fun accept_piece/1),
+	io:format("<downloader> dying~n").
 
 	
 %% @doc Starts a worker
@@ -33,15 +50,67 @@ start() ->
 %% Starts a worker, carrying the content Content and
 %% connects to the drone on Address:Port.
 %% </p>
-start(Address, Port, Content) ->
+init(Address, Port, Content) ->
 	io:format("<worker> entering hive~n"),
 	case network:conn(Address, Port) of
+	
 		{error, Reason} ->
 			io:format("<worker> could not enter hive: ~s~n", [Reason]);
-		{Key, Sock} ->
-			io:format("<worker> entered hive successfully~n"),
-			% TODO: handle errors
-			network:send(Sock, Key, Content),
-			io:format("<worker> dying~n"),
-			network:close(Sock)
+			
+		{ok, Sock} ->
+			io:format("<worker> connected to drone~n"),
+			case network:handshake(Sock) of
+			
+				{error, Reason} ->
+					io:format("<worker> could not handshake with drone: ~s~n", [Reason]);
+					
+				{Key, Sock} ->
+					io:format("<worker> entered hive successfully~n"),
+					% TODO: handle errors
+					io:format("<worker> sending content list~n"),
+					network:send(Sock, Key, Content),
+					io:format("<worker> closing connection~n"),
+					network:close(Sock),
+					Key
+			end
 	end.
+	
+	
+%% @doc Handles an incoming request
+%% <p>
+%% Callback which is called when an incoming connection
+%% is made from the drone to send a piece.
+%% </p>
+send_piece(Sock) ->
+	io:format("<worker> incoming request from drone~n"),
+	
+	% TODO: handle errors
+	Response = network:recv(Sock, ""),
+	io:format("<worker> received request: ~s~n", [Response]),
+	
+	% sleep in order to let the other worker get ready for us
+	timer:sleep(1000),
+	
+	{ok, SSock} = network:conn("localhost", 4567),
+	network:send(SSock, "Key", "AwesomePiece"),
+	network:close(SSock),
+	
+	io:format("<worker> closing connection to drone~n"),
+	network:close(Sock),
+	eol.
+	
+%% @doc Handles an incoming piece
+%% <p>
+%% Callback which is called when an incoming connection
+%% is made from another worker which is about to send a piece.
+%% </p>
+accept_piece(Sock) ->
+	io:format("<worker> incoming piece from worker~n"),
+	
+	% TODO: handle errors
+	Response = network:recv(Sock, ""),
+	io:format("<worker> received piece: ~s~n", [Response]),
+	
+	io:format("<worker> closing connection to worker~n"),
+	network:close(Sock),
+	eol.
