@@ -36,10 +36,10 @@ clean_docs:
 	- cp *.edoc $(EDOC)/
 	
 start_worker: build
-	erl -noshell -s worker start -s init stop
+	erl -noshell -pa $(EBIN) -s worker start -s init stop
 	
 start_drone: build
-	erl -noshell -s drone start
+	erl -noshell -pa $(EBIN) -s drone start
 
 test:
 	erl -noshell -pa $(EBIN) -eval 'eunit:test("$(EBIN)", [verbose])' -s init stop
