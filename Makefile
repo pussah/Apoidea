@@ -1,12 +1,39 @@
+OPT = -W
 CC = erlc
-FILES = network.erl worker.erl drone.erl crypto.erl utils.erl
 
-# TODO: dependencies
-build: $(FILES)
-	$(CC) $(FILES)
+ESRC = src
+EBIN = bin
+EDOC = doc
+
+SRC = $(wildcard $(ESRC)/*.erl)
+TARGET = $(addsuffix .beam, $(basename $(addprefix $(EBIN)/, $(notdir $(SRC)))))
+
+SEP :=  ","
+EMPTY:=
+SPACE:= $(EMPTY) $(EMPTY)
+DOC_SRC = $(addsuffix ", $(addprefix ", $(strip $(subst $(SPACE),$(SEP),$(SRC)))))
+
+# make sure all folders exists
+$(shell [ -d "$(EBIN)" ] || mkdir -p $(EBIN))
+$(shell [ -d "$(EDOC)" ] || mkdir -p $(EDOC))
+
+all: build test docs
+
+build: $(TARGET)
+
+$(EBIN)/%.beam: $(ESRC)/%.erl
+	$(CC) $(OPT) -o $(EBIN) $<
 	
 clean:
-	rm -rf *.beam erl_crash.dump doc
+	- rm -Rf $(EBIN)/*.beam
+	
+distclean:
+	- rm -Rf $(EBIN)
+	- rm -Rf $(EDOC)
+	
+clean_docs:
+	- rm -Rf $(EDOC)/*.*
+	- cp *.edoc $(EDOC)/
 	
 start_worker: build
 	erl -noshell -s worker start -s init stop
@@ -14,15 +41,33 @@ start_worker: build
 start_drone: build
 	erl -noshell -s drone start
 
-# TODO: make it prettier
-test: build
-	erl -noshell -s network test -s init stop
-	erl -noshell -s worker test -s init stop
-	erl -noshell -s crypto test -s init stop
-	erl -noshell -s drone test -s init stop
-	erl -noshell -s utils test -s init stop
+test:
+	erl -noshell -pa $(EBIN) -eval 'eunit:test("$(EBIN)", [verbose])' -s init stop
 	
-doc:
-	erl -noshell -eval "edoc:files(["`echo "$(FILES)" | sed s/\ /,/g`"], [{dir, doc}])." -s init stop
+docs: clean_docs
+	erl -noshell -run edoc_run files '[$(DOC_SRC)]' '[{dir, "$(EDOC)"}, {new, true}]'
 	
 rebuild: clean build
+
+help:
+	@echo "== Welcome to the Apoidea Project =="
+	@echo ""
+	@echo "Secure and anonymous file sharing in Erlang."
+	@echo "Made by The Awesome Team at Uppsala University."
+	@echo ""
+	@echo "Sunshine!"
+	@echo ""
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Targets:"
+	@echo "\tall (default)	Builds everything"
+	@echo "\tbuild		Builds only the binary"
+	@echo "\tdocs		Builds the documentation"
+	@echo "\ttest		Run tests"
+	@echo "\trebuild		Rebuild the binary"
+	@echo "\tclean		Clean up binary files"
+	@echo "\tdistclean	Clean up everything"
+	@echo "\tstart_drone	Start a drone"
+	@echo "\tstart_worker	Start a worker"
+	@echo "\thelp		This help text"
+	@echo ""

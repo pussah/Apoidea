@@ -1,6 +1,8 @@
 %% @author ??? <???@student.uu.se>
 %% @copyright 2011 The Awesome Team
 %% @doc A Swiss Army Knife
+%% <p>
+%% </p>
 %% bla bla bla
 
 -module(utils).
@@ -8,6 +10,8 @@
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc Generates a string from a content list.
+%% <p>
+%% </p>
 %% A content list is on the format
 %% [Content1, Content2, ..., ContentN]
 %% where ContentX = [Name, NumberOfPieces, PiecesInPossesion]
@@ -45,17 +49,23 @@ generate_content_string([H|T]) ->
 	end.
 	
 %% @doc Generates a content list from a content string
+%% <p>
+%% </p>
 generate_content_list(String) -> generate_content_tuples(string:tokens(String, "\n")).
 
 %% @doc TODO
+%% <p>
+%% </p>
 generate_content_tuples([]) -> [];
 generate_content_tuples([H|T]) -> 
 	Tuple = parse_content_tuple(list_to_tuple(string:tokens(H, "\t"))),
 	lists:append([Tuple], generate_content_tuples(T)).
 	
 %% @doc Parse a content tuple
+%% <p>
 %% Turns the third element of a content tuple from a string into
 %% either an atom or a list and fixes all integers.
+%% </p>
 parse_content_tuple({Name, Pieces, "all"}) -> {Name, string_to_int(Pieces), all};
 parse_content_tuple({Name, Pieces, Possessions}) ->
 	{
@@ -65,15 +75,23 @@ parse_content_tuple({Name, Pieces, Possessions}) ->
 	}.
 
 %% @doc Turns a list of strings into a list of integers
+%% <p>
+%% TODO
+%% </p>
 strings_to_ints([]) -> [];
 strings_to_ints([H|T]) -> lists:append([string_to_int(H)], strings_to_ints(T)).
 
 %% @doc Turns a string into an integer
+%% <p>
+%% TODO
+%% </p>
 string_to_int(S) -> element(1, string:to_integer(S)).
 		
 %% @doc Generate a string from a list
+%% <p>
 %% Create a string from the list List using Sep as
 %% the separator between each element.
+%% </p>
 list_to_string([], _) -> lists:concat([]);
 list_to_string([H], _) -> lists:concat([H]);
 list_to_string([H|T], Sep) ->

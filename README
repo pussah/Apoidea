@@ -12,19 +12,18 @@ PREREQUISITES:
 	4. GNU Make
 	
 DOWNLOAD:
+	After you have created an account on GitHub you can run
 	$ git clone git@github.com:ephracis/Apoidea.git
 	
-BUILD:
+BUILD AND RUN:
+	$ cd Apoidea
 	$ make
-	
-GENERATE DOCUMENTATION:
-	$ make doc
-	
-RUN TESTS:
-	$ make test
-	
-START A DRONE:
 	$ make start_drone
 	
-START A WORKER:
+	Open up a second terminal and run:
 	$ make start_worker
+	
+	Shut down the drone with Ctrl-C
+	
+FURTHER INSTRUCTIONS:
+	$ make help

@@ -1,8 +1,10 @@
 %% @author Christoffer Brodd-Reijer <christoffer.brodd-reijer.3663@student.uu.se>
 %% @copyright 2011 The Awesome Team
 %% @doc Low-level network module
+%% <p>
 %% Sends and receives data over the network.
 %% bla bla bla, more info goes here
+%% </p>
 
 -module(network).
 -export([conn/2, send/3, send/5, recv/2, listen/2, close/1]).
@@ -12,8 +14,10 @@
 
 
 %% @doc Creates a connection over TCP
+%% <p>
 %% Connect to Address:Port over TCP and
 %% does a three-way handshake
+%% </p>
 conn(Address, Port) ->
 	case gen_tcp:connect(Address, Port, ?TCPOPTS) of
 	
@@ -59,14 +63,18 @@ conn(Address, Port) ->
 	end.
 
 %% @doc Sends an encrypted message over a socket
+%% <p>
 %% Uses Key to encrypt Message and sends it over Sock.
+%% </p>
 send(Sock, Key, Message) ->
 	CryptMessage = crypto:encrypt(Message, Key),
 	gen_tcp:send(Sock, CryptMessage).
 
 %% @doc Sends an encrypted message over TCP or UDP
+%% <p>
 %% Connects to Address:Port and sends Message
 %% encrypted using Key over TCP or UDP.
+%% </p>
 send(Address, Port, Key, tcp, Message) ->
 	case gen_tcp:connect(Address, Port, ?TCPOPTS) of
 		{error, Reason} -> {error, report_error(Reason)};
@@ -87,7 +95,9 @@ send(Address, Port, Key, udp, Message) ->
 send(_, _, _, _, _) -> {error, unknown_proto}.
 	
 %% @doc Receives an encrypted message over a socket
+%% <p>
 %% Receives data from Sock and decrypts it using Key.
+%% </p>
 recv(Sock, Key) ->
 	case gen_tcp:recv(Sock, 0) of
 		{error, Reason} -> {error, report_error(Reason)};
@@ -95,8 +105,10 @@ recv(Sock, Key) ->
 	end.
 	
 %% @doc Listens for connections
+%% <p>
 %% Listens for incoming connection on port Port and calls
 %% Callback when a connection is accepted.
+%% </p>
 listen(Port, Callback) ->
 	case gen_tcp:listen(Port, ?TCPOPTS) of
 		{error, Reason} -> {error, report_error(Reason)};
@@ -104,8 +116,10 @@ listen(Port, Callback) ->
 	end.
 
 %% @doc Listens for connections over a socket
+%% <p>
 %% Listens for incoming connection on ListenSock and calls
 %% Callback when a connection is accepted.
+%% </p>
 listen(sock, ListenSock, Callback) ->
 	case gen_tcp:accept(ListenSock) of
 		{error, Reason} -> {error, report_error(Reason)};
@@ -116,12 +130,16 @@ listen(sock, ListenSock, Callback) ->
 	end.
 	
 %% @doc Closes a socket
+%% <p>
 %% Closes the connection over Sock.
+%% </p>
 close(Sock) ->
 	gen_tcp:close(Sock).
 	
 %% @doc Prints an error
+%% <p>
 %% Prints an error message to STDOUT according to Error.
+%% </p>
 report_error(Error) ->
 	case Error of
 		closed ->

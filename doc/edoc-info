@@ -1,2 +1,0 @@
-{packages,[]}.
-{modules,[crypto,drone,network,utils,worker]}.

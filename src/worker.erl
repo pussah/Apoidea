@@ -1,8 +1,10 @@
 %% @author Christoffer Brodd-Reijer <christoffer.brodd-reijer.3663@student.uu.se>
 %% @copyright 2011 The Awesome Team
 %% @doc The worker of the swarm
+%% <p>
 %% Equivalent to a peer/seeder in the BitTorrent world.
 %% bla bla bla, more info goes here
+%% </p>
 
 -module(worker).
 -export([start/0, start/3]).
@@ -10,7 +12,9 @@
 
 	
 %% @doc Starts a worker
-%% Dummy function for starting a predefined worker
+%% <p>
+%% Dummy function for starting a predefined worker.
+%% </p>
 start() -> 
 	% TODO: how do we represent content?
 	% Should be a list of files the worker has and the number 
@@ -25,8 +29,10 @@ start() ->
 
 	
 %% @doc Starts a worker
+%% <p>
 %% Starts a worker, carrying the content Content and
 %% connects to the drone on Address:Port.
+%% </p>
 start(Address, Port, Content) ->
 	io:format("<worker> entering hive~n"),
 	case network:conn(Address, Port) of
