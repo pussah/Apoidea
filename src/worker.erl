@@ -7,50 +7,56 @@
 %% </p>
 
 -module(worker).
--export([start_uploader/0, start_downloader/0, init/3]).
+-export([start_uploader/2, start_downloader/3, init/2, content/0, listen/1]).
 -include_lib("eunit/include/eunit.hrl").
 
+
+content() ->
+    Content = 
+	[
+		{"Filename1", 10, [1, 2, 3]},
+		{"Filename2", 2, all},
+		{"Filename3", 2, [1]}
+	],
+    utils:generate_content_string(Content).
 
 %% @doc Starts a worker and listens for requests
 %% <p>
 %% Dummy function for starting a predefined worker which
 %% connects to a hive and then listens for connections.
 %% </p>
-start_uploader() -> 
-	Content = 
-	[
-		{"Filename1", 10, [1, 2, 3]},
-		{"Filename2", 2, all},
-		{"Filename3", 2, [1]}
-	],
-	io:format("<uploader> starting~n"),
-	init("localhost", 5678, utils:generate_content_string(Content)),
-	io:format("<uploader> listening for requests~n"),
-	network:listen(6789, fun send_piece/1).
-	
+start_uploader(Key, Sock) -> 
+    
+    io:format("<uploader> starting~n"),
+    network:send(Sock, Key, content()),
+    io:format("<uploader> listening for requests~n"),
+    listen(Sock).
+
+listen(Sock) ->
+    network:listen(6789, fun send_piece/1),
+    listen(Sock).
 
 %% @doc Starts a worker and sends a request
 %% <p>
 %% Dummy function for starting a predefined worker which
 %% connects to a hive and then requests a file.
 %% </p>
-start_downloader() -> 
+start_downloader(FileName, Key, Sock) ->
 	io:format("<downloader> starting~n"),
-	Key = init("localhost", 5678, utils:generate_content_string([])),
 	io:format("<downloader> sending request for file~n"),
-	{ok, Sock} = network:conn("localhost", 5678),
-	network:send(Sock, Key, "request"),
+	%{ok, Sock} = network:conn("localhost", 5678),
+	network:send(Sock, Key, "request"), %Stuck here...
 	io:format("<downloader> listening for piece~n"),
 	network:listen(4567, fun accept_piece/1),
 	io:format("<downloader> dying~n").
 
-	
+
 %% @doc Starts a worker
 %% <p>
 %% Starts a worker, carrying the content Content and
 %% connects to the drone on Address:Port.
 %% </p>
-init(Address, Port, Content) ->
+init(Address, Port) ->
 	io:format("<worker> entering hive~n"),
 	case network:conn(Address, Port) of
 	
@@ -68,10 +74,10 @@ init(Address, Port, Content) ->
 					io:format("<worker> entered hive successfully~n"),
 					% TODO: handle errors
 					io:format("<worker> sending content list~n"),
-					network:send(Sock, Key, Content),
+					start_uploader(Key, Sock),
 					io:format("<worker> closing connection~n"),
 					network:close(Sock),
-					Key
+					{Key, Sock}
 			end
 	end.
 	

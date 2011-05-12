@@ -21,12 +21,9 @@ BUILD AND RUN:
 	$ make start_drone
 	
 	Open up a second terminal and run:
-	$ make start_uploader
+	$ make start_worker
 	
-	Open up a third terminal and run:
-	$ make start_downloader
-	
-	Shut down the drone with Ctrl-C afterwards
+	Shut down the drone with Ctrl-C
 	
 FURTHER INSTRUCTIONS:
 	$ make help
