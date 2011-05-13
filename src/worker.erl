@@ -79,7 +79,7 @@ init(Address, Port) ->
 					io:format("<worker> closing connection~n"),
 					network:close(Sock),
 					io:format("<worker> socket: ~w~n", [Sock]),
-					{Key, Sock}
+					Key
 			end
 	end.
 	
