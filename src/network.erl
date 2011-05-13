@@ -119,6 +119,7 @@ recv(Sock, Key) ->
 %% </p>
 listen(Port, Callback) ->
 	io:format("<<<Listening initated>>>~n"),
+	timer:sleep(1000),
 	case gen_tcp:listen(Port, ?TCPOPTS) of
 		{error, Reason} -> {error, report_error(Reason)};
 		{ok, Sock} -> listen(sock, Sock, Callback)

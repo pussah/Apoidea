@@ -33,8 +33,12 @@ start_uploader(Key, Sock) ->
     listen(Sock).
 
 listen(Sock) ->
-    network:listen(6789, fun send_piece/1),
-    listen(Sock).
+	case network:listen(6789, fun send_piece/1) of
+	{error, Reason} ->
+			io:format("<uploader> Could not listen: ~s~n", [Reason]);
+	eol -> listen(Sock);
+	_ -> io:format(" Wtf? ~n")
+	end.
 
 %% @doc Starts a worker and sends a request
 %% <p>
