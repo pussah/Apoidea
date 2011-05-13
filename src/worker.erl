@@ -74,7 +74,7 @@ init(Address, Port) ->
 					io:format("<worker> entered hive successfully~n"),
 					% TODO: handle errors
 					io:format("<worker> sending content list~n"),
-					start_uploader(Key, Sock),
+					spawn(worker, start_uploader, [Key, Sock]),
 					io:format("<worker> closing connection~n"),
 					network:close(Sock),
 					{Key, Sock}
