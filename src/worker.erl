@@ -78,6 +78,7 @@ init(Address, Port) ->
 					timer:sleep(1000),
 					io:format("<worker> closing connection~n"),
 					network:close(Sock),
+					io:format("<worker> socket: ~w~n", [Sock]),
 					{Key, Sock}
 			end
 	end.
