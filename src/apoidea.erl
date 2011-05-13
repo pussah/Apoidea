@@ -23,7 +23,7 @@ start1(Key, IP) ->
 	"/download\n" -> io:format("\nDownload\n\nEnter the name of the file you wish to download: "),
 	FileName1 = io:get_line("\nApoidea> "),
 	FileName = string:substr(FileName1, 1, length(FileName1) -1),
-	io:format("Apoidea> socket: ~w~n", [IP]),
+	%io:format("Apoidea> socket: ~w~n", [IP]),
 	case FileName of
 		"/back\n" -> start1(Key, IP);
 		"/quit\n" -> init:stop();
