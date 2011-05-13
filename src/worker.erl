@@ -73,6 +73,7 @@ init(Address, Port) ->
 					% TODO: handle errors
 					io:format("<worker> sending content list~n"),
 					spawn(worker, start_uploader, [Key, Sock]),
+					timer:sleep(1000),
 					io:format("<worker> closing connection~n"),
 					network:close(Sock),
 					{Key, Sock}
