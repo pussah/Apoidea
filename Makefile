@@ -36,7 +36,7 @@ clean_docs:
 	- cp *.edoc $(EDOC)/
 	
 start: build
-	erl -noshell -pa $(EBIN) -s apoidea start_uploader -s init stop
+	erl -noshell -pa $(EBIN) -s apoidea start -s init stop
 	
 start_drone: build
 	erl -noshell -pa $(EBIN) -s drone start
