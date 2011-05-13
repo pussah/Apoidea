@@ -44,12 +44,10 @@ listen(Sock) ->
 start_downloader(FileName, Key, Sock) ->
 	io:format("<downloader> starting~n"),
 	io:format("<downloader> sending request for file~n"),
-	%{ok, Sock} = network:conn("localhost", 5678),
-	network:send(Sock, Key, "request"), %Stuck here...
+	network:send(Sock, Key, "request"),
 	io:format("<downloader> listening for piece~n"),
 	network:listen(4567, fun accept_piece/1),
 	io:format("<downloader> dying~n").
-
 
 %% @doc Starts a worker
 %% <p>
