@@ -118,7 +118,7 @@ recv(Sock, Key) ->
 %% Callback when a connection is accepted.
 %% </p>
 listen(Port, Callback) ->
-	io:format("<<<Listening initated>>>~n"),
+	io:format("<<<Listening initated by: ~w on port: ~w >>>~n", [self(), Port]),
 	timer:sleep(1000),
 	case gen_tcp:listen(Port, ?TCPOPTS) of
 		{error, Reason} -> {error, report_error(Reason)};
@@ -131,12 +131,12 @@ listen(Port, Callback) ->
 %% Callback when a connection is accepted.
 %% </p>
 listen(sock, ListenSock, Callback) ->
-	io:format("Listening. . . ~n"),
+	io:format("Listening. . . by: ~w ~n", [self()]),
 	case gen_tcp:accept(ListenSock) of
 		{error, Reason} -> {error, report_error(Reason)};
 		
 		{ok, Sock} ->
-			case Callback(Sock) of
+			case Callback(Sock) of %spawn 
 				ok -> listen(sock, ListenSock, Callback);
 				eol -> eol
 			end

@@ -36,7 +36,7 @@ listen(Sock) ->
 	case network:listen(6789, fun send_piece/1) of
 	{error, Reason} ->
 			io:format("<uploader> Could not listen: ~s~n", [Reason]);
-	eol -> listen(Sock);
+	eol -> io:format("<<<<send_piece done>>>>~n"),listen(Sock);
 	_ -> io:format(" Wtf? ~n")
 	end.
 
@@ -50,6 +50,7 @@ start_downloader(FileName, Key, Sock) ->
 	io:format("<downloader> sending request for file~n"),
 	%{ok, Sock} = network:conn("localhost", 5678),
 	network:send(Sock, Key, "request"), %Stuck here...
+	network:close(Sock),
 	io:format("<downloader> listening for piece~n"),
 	network:listen(4567, fun accept_piece/1),
 	io:format("<downloader> dying~n").
@@ -95,7 +96,7 @@ init(Address, Port) ->
 %% </p>
 send_piece(Sock) ->
 	io:format("<worker> incoming request from drone~n"),
-	
+	io:format("<uploader> My ID is: ~w~n", [self()]),
 	% TODO: handle errors
 	Response = network:recv(Sock, ""),
 	io:format("<worker> received request: ~s~n", [Response]),
@@ -109,7 +110,7 @@ send_piece(Sock) ->
 	
 	io:format("<worker> closing connection to drone~n"),
 	network:close(Sock),
-	eol.
+	ok.
 	
 %% @doc Handles an incoming piece
 %% <p>
@@ -118,7 +119,7 @@ send_piece(Sock) ->
 %% </p>
 accept_piece(Sock) ->
 	io:format("<worker> incoming piece from worker~n"),
-	
+	io:format("<downloader> My ID is: ~w~n", [self()]),
 	% TODO: handle errors
 	Response = network:recv(Sock, ""),
 	io:format("<worker> received piece: ~s~n", [Response]),
