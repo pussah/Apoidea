@@ -16,8 +16,7 @@ start1(Key, Sock) ->
 			 "/back" -> start1(Key, Sock);
 			 "/quit" -> init:stop();
 			 Other -> {Key_1, Sock_1} = worker:init(IP_adress, 5678), start1(Key_1, Sock_1)
-		     end,
-		     start1(Key, Sock);
+		     end;
 	"/download\n" -> io:format("\nDownload\n\nEnter the name of the file you wish to download: "),
 			 FileName = io:get_line("\nApoidea> "),
 			 case FileName of
