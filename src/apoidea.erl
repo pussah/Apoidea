@@ -19,6 +19,7 @@ start1(Key, Sock) ->
 		     end;
 	"/download\n" -> io:format("\nDownload\n\nEnter the name of the file you wish to download: "),
 			 FileName = io:get_line("\nApoidea> "),
+<<<<<<< HEAD
 			 io:format("Apoidea> socket: ~w~n", [Sock]),
 			 case FileName of
 			     "/back\n" -> start1(Key, Sock);
@@ -26,6 +27,13 @@ start1(Key, Sock) ->
 			     Other -> 
 					{ok , SSock} =  network:conn("localhost", 5678),
 					worker:start_downloader(FileName, Key, SSock)
+=======
+			 FileName_1 = string:substr(FileName, 1, length(FileName) - 1),
+			 case FileName of
+			     "/back\n" -> start1(Key, Sock);
+			     "/quit\n" -> init:stop();
+			     Other -> worker:start_downloader(FileName_1, Key, Sock)
+>>>>>>> upstream/master
 			 end,
 			 start1(Key, Sock);
 	"/quit\n" -> init:stop();
