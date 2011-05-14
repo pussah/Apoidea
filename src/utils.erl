@@ -6,7 +6,7 @@
 %% bla bla bla
 
 -module(utils).
--export([generate_content_string/1, generate_content_list/1, list_to_string/2, parse_content_tuple/1]).
+-export([generate_content_string/1, generate_content_list/1, list_to_string/2, parse_content_tuple/1, strings_to_ints/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 %% @doc Generates a string from a content list.

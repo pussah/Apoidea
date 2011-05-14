@@ -9,7 +9,7 @@
 -module(worker).
 -export([start_uploader/2, start_downloader/4, init/2, content/0, uploader_loop/1]).
 -include_lib("eunit/include/eunit.hrl").
-
+-define(UPLOADPORT, 6789).
 
 content() ->
     Content = 
@@ -29,11 +29,18 @@ start_uploader(Key, Sock) ->
     
     io:format("<uploader> starting~n"),
     network:send(Sock, Key, content()),
+	%timer:sleep(1000),
+	LSock = network:listenInit(0),
+	{ok, PSock} = inet:port(LSock),
+	SSock = lists:flatten(io_lib:format("~p", [PSock])),
+	io:format("<uploader> printing Listening Port: ~w~n", [SSock]),
+	network:send(Sock, Key, SSock),
+	%network:send(Sock, Key, 
     io:format("<uploader> listening for requests~n"),
-    uploader_loop(Sock).
+    uploader_loop(LSock).
 
 uploader_loop(Sock) ->
-	case network:listen(6789, fun send_piece/1) of
+	case network:listen(sock, Sock, fun send_piece/1) of
 	{error, Reason} ->
 			io:format("<uploader> Could not listen: ~s~n", [Reason]);
 	eol -> io:format("<<<<send_piece done>>>>~n"),uploader_loop(Sock);

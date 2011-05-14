@@ -1,5 +1,6 @@
 -module(apoidea).
 -export([start/0]).
+-define(DRONEPORT, 5678).
 
 start() ->
     io:format("=========== Welcome to Apoidea ===========\nFor a list of available commands, type 'help'"),
@@ -18,8 +19,8 @@ start1(Key, IP, ClientListenSock) ->
 		"/back" -> start1(Key, IP, ClientListenSock);
 		"/quit" -> init:stop();
 		Other -> 
-			CLS = network:downloadInit(4567),
-			Key_1 = worker:init(IP_adress, 5678), 
+			CLS = network:listenInit(4567),
+			Key_1 = worker:init(IP_adress, ?DRONEPORT), 
 			start1(Key_1, IP_adress, CLS)
 	end;
 
@@ -31,7 +32,7 @@ start1(Key, IP, ClientListenSock) ->
 		"/back\n" -> start1(Key, IP, ClientListenSock);
 		"/quit\n" -> init:stop();
 		Other ->
-			{ok , SSock} = network:conn(IP, 5678),
+			{ok , SSock} = network:conn(IP, ?DRONEPORT),
 			worker:start_downloader(FileName, Key, SSock, ClientListenSock)
 		end,
 		start1(Key, IP, ClientListenSock);

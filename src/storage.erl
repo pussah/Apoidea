@@ -1,11 +1,11 @@
 -module(storage).
--export([table/0, add_file/2,  all/1,  add_crap/0]).
+-export([start/0, add_crap/0]).
 -include_lib("eunit/include/eunit.hrl").
 
 
 
 table() ->
-	ets:new('FileList', []).
+	ets:new('TheFileList', []).
 
 add_file(FileMap, {IP, Port, Name, Peices, Possessions}) ->
 	ets:insert(FileMap, {{Name, IP}, Port, Peices, Possessions}).
@@ -28,7 +28,26 @@ del_client(FileMap, IP) ->
 	ets:match_delete(FileMap, {{'_', IP}, '_', '_', '_'}).
 	%ets:delete_object(FileMap, {{'_', IP}, '_', '_', '_'}).
 	%ets:delete(FileMap, {'_', IP}).
-	
+
+start() ->
+	FileMap = table(),
+	loop(FileMap).
+
+loop(FileMap) ->
+	receive 
+		{add, Addr, Port, Name, Peices, Possessions} ->
+			add_file(FileMap, {Addr, Port, Name, Peices, Possessions}),
+			loop(FileMap);
+		{findfile, File, PID} ->
+			case find_file(FileMap, File) of
+				[] -> PID ! nosuchfile;
+				[T|H] -> PID ! {foundfile, T}
+			end
+	end.
+		
+		
+
+
 add_crap() ->
 	FileMap = table(),
 	add_file(FileMap, {"localhost", 80, "Testfile", 10, all}),
