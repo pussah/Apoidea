@@ -42,7 +42,8 @@ loop(FileMap) ->
 			case find_file(FileMap, File) of
 				[] -> PID ! nosuchfile;
 				[T|H] -> PID ! {foundfile, T}
-			end
+			end,
+			loop(FileMap)
 	end.
 		
 		

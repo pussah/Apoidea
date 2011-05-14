@@ -84,6 +84,7 @@ accept_worker(Sock) ->
 			io:format("<drone> received request for piece~n"),
 			File = "Filename1",
 			fileList ! {findfile, File, self()},
+			io:format("<drone> just talked to storage ~n"),
 			receive
 				nosuchfile ->
 					io:format("<drone> no such file ~n"),
