@@ -7,7 +7,7 @@
 %% </p>
 
 -module(network).
--export([conn/2, send/3, send/5, recv/2, listen/2, close/1, handshake/1]).
+-export([conn/2, send/3, send/5, recv/2, listen/2, listen/3, downloadInit/1,	close/1, handshake/1]).
 -define(TCPOPTS, [list, {active, false}, {packet, 0}]).
 -define(UDPOPTS, [list, {active, false}, {packet, 0}]).
 -include_lib("eunit/include/eunit.hrl").
@@ -141,7 +141,18 @@ listen(sock, ListenSock, Callback) ->
 				eol -> eol
 			end
 	end.
-	
+
+%% @doc Initiating a listen
+%% <p>
+%% Listens on Port, and returns the Listen Socket.
+%% </p>
+downloadInit(Port) ->
+	case gen_tcp:listen(Port, ?TCPOPTS) of
+		{error, Reason} -> {error, report_error(Reason)};
+        {ok, Sock} -> Sock
+	end.
+
+
 %% @doc Closes a socket
 %% <p>
 %% Closes the connection over Sock.

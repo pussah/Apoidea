@@ -7,7 +7,7 @@
 %% </p>
 
 -module(worker).
--export([start_uploader/2, start_downloader/3, init/2, content/0, listen/1]).
+-export([start_uploader/2, start_downloader/4, init/2, content/0, uploader_loop/1]).
 -include_lib("eunit/include/eunit.hrl").
 
 
@@ -30,13 +30,13 @@ start_uploader(Key, Sock) ->
     io:format("<uploader> starting~n"),
     network:send(Sock, Key, content()),
     io:format("<uploader> listening for requests~n"),
-    listen(Sock).
+    uploader_loop(Sock).
 
-listen(Sock) ->
+uploader_loop(Sock) ->
 	case network:listen(6789, fun send_piece/1) of
 	{error, Reason} ->
 			io:format("<uploader> Could not listen: ~s~n", [Reason]);
-	eol -> io:format("<<<<send_piece done>>>>~n"),listen(Sock);
+	eol -> io:format("<<<<send_piece done>>>>~n"),uploader_loop(Sock);
 	_ -> io:format(" Wtf? ~n")
 	end.
 
@@ -45,14 +45,14 @@ listen(Sock) ->
 %% Dummy function for starting a predefined worker which
 %% connects to a hive and then requests a file.
 %% </p>
-start_downloader(FileName, Key, Sock) ->
+start_downloader(FileName, Key, Sock, LSock) ->
 	io:format("<downloader> starting~n"),
 	io:format("<downloader> sending request for file~n"),
 	%{ok, Sock} = network:conn("localhost", 5678),
 	network:send(Sock, Key, "request"), %Stuck here...
 	network:close(Sock),
 	io:format("<downloader> listening for piece~n"),
-	network:listen(4567, fun accept_piece/1),
+	network:listen(sock, LSock, fun accept_piece/1),
 	io:format("<downloader> dying~n").
 
 
